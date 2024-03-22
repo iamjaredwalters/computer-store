@@ -1,25 +1,10 @@
-import { useEffect, useState } from "react";
-import { useDebounce } from "use-debounce";
-
-export const Nav = ({ setProducts }: { setProducts: any }) => {
-  const [query, setQuery] = useState("");
-  const [debouncedQuery] = useDebounce(query, 250);
-
-  useEffect(() => {
-    if (debouncedQuery.trim().length > 0) {
-      console.log(debouncedQuery);
-      // fetch products from localhost:3000/products?search=debouncedQuery
-      // TODO: use env var for real url
-      fetch(`http://localhost:3000/products?query=${debouncedQuery}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          setProducts(data);
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [debouncedQuery, setProducts]);
-
+export const Search = ({
+  query,
+  setQuery,
+}: {
+  query: string;
+  setQuery: React.Dispatch<React.SetStateAction<string>>;
+}) => {
   return (
     <nav className="bg-white border-gray-200">
       <div className="max-w-container flex flex-wrap items-center justify-between mx-auto p-4">

@@ -5,7 +5,7 @@ export class ProductsSearchParams {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  skip?: number;
+  page?: number;
 
   @IsOptional()
   query?: string;

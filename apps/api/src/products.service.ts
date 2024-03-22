@@ -8,15 +8,29 @@ export class ProductsService {
 
   async products(params: {
     query?: string;
-    skip?: number;
+    page?: number;
     cursor?: Prisma.ProductWhereUniqueInput;
     orderBy?: Prisma.ProductOrderByWithRelationInput;
-  }): Promise<
-    Pick<Product, 'image' | 'title' | 'vendor' | 'price' | 'strikedPrice'>[]
-  > {
-    const { skip, cursor, query, orderBy } = params;
+  }): Promise<{
+    products: Pick<
+      Product,
+      'image' | 'title' | 'vendor' | 'price' | 'strikedPrice'
+    >[];
+    count: number;
+  }> {
+    const { page, cursor, query, orderBy } = params;
+    const PAGE_SIZE = 12;
     console.log({ params });
-    return this.prisma.product.findMany({
+    const count = await this.prisma.product.count({
+      where: {
+        OR: [
+          { title: { contains: query, mode: 'insensitive' } },
+          { vendor: { contains: query, mode: 'insensitive' } },
+        ],
+      },
+    });
+
+    const products = await this.prisma.product.findMany({
       select: {
         title: true,
         price: true,
@@ -30,10 +44,12 @@ export class ProductsService {
           { vendor: { contains: query, mode: 'insensitive' } },
         ],
       },
-      skip,
-      take: 12,
+      skip: page * PAGE_SIZE,
+      take: PAGE_SIZE,
       cursor,
       orderBy,
     });
+
+    return { products, count };
   }
 }

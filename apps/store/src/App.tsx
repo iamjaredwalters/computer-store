@@ -1,7 +1,7 @@
-import { useState } from "react";
-import "./App.css";
-import { Nav } from "./Nav";
+import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 import { Results } from "./Results";
+import { Search } from "./Search";
 
 export type Product = {
   title: string;
@@ -13,11 +13,57 @@ export type Product = {
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [query, setQuery] = useState("");
+  const [debouncedQuery] = useDebounce(query, 250);
+
+  const fetchProducts = async (
+    query: string,
+    page: number
+  ): Promise<{ products: Product[]; count: number }> => {
+    const res = await fetch(
+      `http://localhost:3000/products?query=${query}&page=${page}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        return data;
+      })
+      .catch((error) => console.error(error));
+
+    return res;
+  };
+
+  const handleClick = async () => {
+    const { products: newProducts } = await fetchProducts(
+      debouncedQuery,
+      currentPage + 1
+    );
+    setProducts([...products, ...newProducts]);
+    setCurrentPage(currentPage + 1);
+  };
+
+  // When a query changes attempt to fetch the first page of products
+  useEffect(() => {
+    if (debouncedQuery.trim().length > 0) {
+      const FIRST_PAGE = 0;
+      fetchProducts(debouncedQuery, FIRST_PAGE).then((data) => {
+        setProducts(data.products);
+        setTotal(data.count);
+        setCurrentPage(FIRST_PAGE);
+      });
+    } else {
+      // Reset state when query is empty
+      setProducts([]);
+      setTotal(0);
+    }
+  }, [debouncedQuery, setProducts]);
 
   return (
     <>
-      <Nav setProducts={setProducts} />
-      <Results products={products} />
+      <Search query={query} setQuery={setQuery} />
+      <Results products={products} total={total} showMore={handleClick} />
     </>
   );
 }
