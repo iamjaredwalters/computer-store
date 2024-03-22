@@ -1,0 +1,16 @@
+services:
+  db:
+    hostname: db
+    image: postgres:16
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      - POSTGRES_DB=shop
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
