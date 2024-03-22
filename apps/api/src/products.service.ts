@@ -9,14 +9,12 @@ export class ProductsService {
   async products(params: {
     query?: string;
     skip?: number;
-    take?: number;
     cursor?: Prisma.ProductWhereUniqueInput;
-    where?: Prisma.ProductWhereInput;
     orderBy?: Prisma.ProductOrderByWithRelationInput;
   }): Promise<
     Pick<Product, 'image' | 'title' | 'vendor' | 'price' | 'strikedPrice'>[]
   > {
-    const { skip, take, cursor, query, orderBy } = params;
+    const { skip, cursor, query, orderBy } = params;
     console.log({ params });
     return this.prisma.product.findMany({
       select: {
@@ -33,7 +31,7 @@ export class ProductsService {
         ],
       },
       skip,
-      take,
+      take: 12,
       cursor,
       orderBy,
     });

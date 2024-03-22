@@ -5,11 +5,6 @@ export class ProductsSearchParams {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
-  take?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
   skip?: number;
 
   @IsOptional()

@@ -10,7 +10,7 @@ export const Nav = ({ setProducts }: { setProducts: any }) => {
       console.log(debouncedQuery);
       // fetch products from localhost:3000/products?search=debouncedQuery
       // TODO: use env var for real url
-      fetch(`http://localhost:3000/products?query=${debouncedQuery}&take=12`)
+      fetch(`http://localhost:3000/products?query=${debouncedQuery}`)
         .then((res) => res.json())
         .then((data) => {
           console.log(data);

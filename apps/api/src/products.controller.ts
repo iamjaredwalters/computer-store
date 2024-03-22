@@ -7,11 +7,10 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  async find(@Query() { skip, take, query }: ProductsSearchParams) {
-    console.log({ skip, take, query });
+  async find(@Query() { skip, query }: ProductsSearchParams) {
+    console.log({ skip, query });
     const products = await this.productsService.products({
       skip,
-      take,
       query,
     });
     // console.log(products);
