@@ -1,4 +1,25 @@
-export const Nav = () => {
+import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
+
+export const Nav = ({ setProducts }: { setProducts: any }) => {
+  const [query, setQuery] = useState("");
+  const [debouncedQuery] = useDebounce(query, 250);
+
+  useEffect(() => {
+    if (debouncedQuery.trim().length > 0) {
+      console.log(debouncedQuery);
+      // fetch products from localhost:3000/products?search=debouncedQuery
+      // TODO: use env var for real url
+      fetch(`http://localhost:3000/products?query=${debouncedQuery}&take=12`)
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setProducts(data);
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [debouncedQuery, setProducts]);
+
   return (
     <nav className="bg-white border-gray-200">
       <div className="max-w-container flex flex-wrap items-center justify-between mx-auto p-4">
@@ -19,9 +40,9 @@ export const Nav = () => {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
               />
             </svg>
@@ -38,9 +59,9 @@ export const Nav = () => {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>
@@ -51,6 +72,8 @@ export const Nav = () => {
               id="search-navbar"
               className="block w-full p-2 ps-10 text-md text-[#AEAEAE] rounded-full bg-[#F7F7F7] focus:ring-blue-500 focus:border-blue-500"
               placeholder="Search"
+              value={query}
+              onChange={(e) => setQuery(e.currentTarget.value)}
             />
           </div>
           <button
@@ -70,9 +93,9 @@ export const Nav = () => {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M1 1h15M1 7h15M1 13h15"
               />
             </svg>
@@ -93,9 +116,9 @@ export const Nav = () => {
               >
                 <path
                   stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                 />
               </svg>

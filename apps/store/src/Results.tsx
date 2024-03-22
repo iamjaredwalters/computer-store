@@ -1,7 +1,7 @@
+import { Product } from "./App";
 import { Card } from "./Card";
-import items from "./assets/items.json";
 
-export const Results = () => {
+export const Results = ({ products }: { products: Product[] }) => {
   return (
     <div className="bg-[#FAFAFA]">
       <div className="max-w-container mx-auto px-4 2xl:max-w-container">
@@ -13,8 +13,8 @@ export const Results = () => {
         </div>
       </div>
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-8 max-w-container mx-auto px-4 2xl:max-w-container bg-[#FAFAFA]">
-        {items.map((item: any) => (
-          <Card key={item.id} item={item} />
+        {products.map((product, idx) => (
+          <Card key={idx} item={product} />
         ))}
       </div>
     </div>

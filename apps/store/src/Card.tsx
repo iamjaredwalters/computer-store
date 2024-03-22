@@ -1,16 +1,19 @@
-export type Item = {
-  vendor: string;
-  title: string;
-  price: string;
-  image: string;
-  "striked-price": string | null;
-};
+import { Product } from "./App";
 
 const Striked = ({ price }: { price: string }) => {
   return <span className="line-through text-sm text-[#9C9C9C]">{price}</span>;
 };
 
-const Price = ({ price, strike }: { price: string; strike: null | string }) => {
+const Price = ({
+  price,
+  strike,
+}: {
+  price: null | string;
+  strike: null | string;
+}) => {
+  if (!price) {
+    return <p className="py-3">No price available</p>;
+  }
   if (!strike) {
     return <p className="py-3">{price}</p>;
   }
@@ -21,7 +24,7 @@ const Price = ({ price, strike }: { price: string; strike: null | string }) => {
   );
 };
 
-export const Card = ({ item }: { item: Item }) => {
+export const Card = ({ item }: { item: Product }) => {
   return (
     <div className="max-w-sm bg-white rounded-3xl shadow-[0_0_4px_0_rgba(0,0,0,0.1)] flex flex-col items-center p-[20px]">
       <div className="h-[132px] w-[132px]">
@@ -37,7 +40,7 @@ export const Card = ({ item }: { item: Item }) => {
           <p className="font-normal text-[#363636]">
             {item.title.substring(0, 60)}...
           </p>
-          <Price price={item.price} strike={item["striked-price"]} />
+          <Price price={item.price} strike={item.strikedPrice} />
         </div>
         <a
           href="#"
