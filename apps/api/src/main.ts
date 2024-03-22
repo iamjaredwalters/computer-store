@@ -11,6 +11,12 @@ async function bootstrap() {
     }),
   );
 
+  // big yikes
+  app.enableCors({
+    allowedHeaders: '*',
+    origin: '*',
+  });
+
   await app.listen(3000);
 }
 bootstrap();
