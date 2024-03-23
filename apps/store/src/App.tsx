@@ -17,7 +17,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState(0);
   const [query, setQuery] = useState("");
   const [debouncedQuery] = useDebounce(query, 250);
-
+  const [error, setError] = useState(false);
   const fetchProducts = async (
     query: string,
     page: number
@@ -27,7 +27,6 @@ function App() {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         return data;
       })
       .catch((error) => console.error(error));
@@ -35,7 +34,8 @@ function App() {
     return res;
   };
 
-  const handleClick = async () => {
+  const getNextPage = async () => {
+    // get the next page of products
     const { products: newProducts } = await fetchProducts(
       debouncedQuery,
       currentPage + 1
@@ -48,11 +48,16 @@ function App() {
   useEffect(() => {
     if (debouncedQuery.trim().length > 0) {
       const FIRST_PAGE = 0;
-      fetchProducts(debouncedQuery, FIRST_PAGE).then((data) => {
-        setProducts(data.products);
-        setTotal(data.count);
-        setCurrentPage(FIRST_PAGE);
-      });
+      fetchProducts(debouncedQuery, FIRST_PAGE)
+        .then((data) => {
+          setProducts(data.products);
+          setTotal(data.count);
+          setCurrentPage(FIRST_PAGE);
+        })
+        .catch(() => {
+          console.error(error);
+          setError(true);
+        });
     } else {
       // Reset state when query is empty
       setProducts([]);
@@ -63,7 +68,14 @@ function App() {
   return (
     <>
       <Search query={query} setQuery={setQuery} />
-      <Results products={products} total={total} showMore={handleClick} />
+      {error ? (
+        <div className="text-red-500 w-full flex justify-center items-center">
+          There was an error fetching products. Please refresh the page and try
+          again.
+        </div>
+      ) : (
+        <Results products={products} total={total} showMore={getNextPage} />
+      )}
     </>
   );
 }
