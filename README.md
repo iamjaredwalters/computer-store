@@ -14,7 +14,9 @@ Great deals on laptops!
 
 ## Getting Started
 
-_In the root of the repo_
+This repo contains a frontend and a backend app. The frontend source code lives in `apps/store` and the backend source code lives in `apps/api`.
+
+_Run the following commands from the root of the repo. No need to change directories into each app._
 
 Install project dependencies
 
