@@ -63,7 +63,7 @@ function App() {
       setProducts([]);
       setTotal(0);
     }
-  }, [debouncedQuery, setProducts]);
+  }, [debouncedQuery, error, setProducts]);
 
   return (
     <>
