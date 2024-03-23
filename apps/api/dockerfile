@@ -1,0 +1,66 @@
+FROM node:18-alpine AS base
+
+FROM base AS builder
+RUN apk add --no-cache libc6-compat
+RUN apk update
+# Install pnpm with corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable `pnpm add --global` on Alpine Linux by setting
+# home location environment variable to a location already in $PATH
+# https://github.com/pnpm/pnpm/issues/784#issuecomment-1518582235
+ENV PNPM_HOME=/usr/local/bin
+
+# Set working directory
+WORKDIR /app
+RUN pnpm -g add turbo
+COPY . .
+RUN turbo prune api --docker
+
+# Add lockfile and package.json's of isolated subworkspace
+FROM base AS installer
+RUN apk add --no-cache libc6-compat
+RUN apk update
+# Install pnpm with corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable `pnpm add --global` on Alpine Linux by setting
+# home location environment variable to a location already in $PATH
+# https://github.com/pnpm/pnpm/issues/784#issuecomment-1518582235
+ENV PNPM_HOME=/usr/local/bin
+
+WORKDIR /app
+
+# First install the dependencies (as they change less often)
+COPY .gitignore .gitignore
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+
+# Build the project
+COPY --from=builder /app/out/full/ .
+# Generate prisma client
+RUN pnpm --filter api run prisma:generate
+RUN pnpm run build --filter=api...
+
+FROM base AS runner
+RUN apk add --no-cache libc6-compat
+RUN apk update
+# Install pnpm with corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
+# Enable `pnpm add --global` on Alpine Linux by setting
+# home location environment variable to a location already in $PATH
+# https://github.com/pnpm/pnpm/issues/784#issuecomment-1518582235
+ENV PNPM_HOME=/usr/local/bin
+
+WORKDIR /app
+
+# Don't run production as root
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nestjs
+
+USER nestjs
+
+COPY --from=installer /app .
+
+# Start the server using the production build
+CMD [ "/bin/sh", "apps/api/entrypoint.sh" ]
