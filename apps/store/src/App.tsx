@@ -23,7 +23,7 @@ function App() {
     page: number
   ): Promise<{ products: Product[]; count: number }> => {
     const res = await fetch(
-      `http://localhost:3000/products?query=${query}&page=${page}`
+      `http://54.191.212.222:3000/products?query=${query}&page=${page}`
     )
       .then((res) => res.json())
       .then((data) => {
